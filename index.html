@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expense Tracker Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">₹</div>
+          <div>
+            <h2>CashFlow</h2>
+            <small>Tracker</small>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <a class="active" href="#">Overview</a>
+          <a href="#">Transactions</a>
+          <a href="#">Reports</a>
+          <a href="#">Budgets</a>
+        </nav>
+
+        <div class="sidebar-card">
+          <span>Monthly Budget</span>
+          <strong id="budgetValue">$5000</strong>
+          <button class="small-btn">Adjust</button>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Dashboard</p>
+            <h1>Expense Overview</h1>
+          </div>
+          <button id="addTransactionBtn" class="primary-btn">+ Add Transaction</button>
+        </header>
+
+        <section class="stats-grid">
+          <article class="stat-card income">
+            <span class="label">Income</span>
+            <strong id="incomeTotal">$0</strong>
+            <small>monthly earning</small>
+          </article>
+          <article class="stat-card expense">
+            <span class="label">Expenses</span>
+            <strong id="expenseTotal">$0</strong>
+            <small>monthly spend</small>
+          </article>
+          <article class="stat-card balance">
+            <span class="label">Balance</span>
+            <strong id="balanceTotal">$0</strong>
+            <small>remaining</small>
+          </article>
+          <article class="stat-card savings">
+            <span class="label">Savings</span>
+            <strong id="savingsTotal">$0</strong>
+            <small>this month</small>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <div class="panel chart-panel">
+            <div class="panel-head">
+              <h3>Spending by category</h3>
+              <span id="monthLabel">This month</span>
+            </div>
+            <div id="chart" class="chart" aria-label="Spending chart"></div>
+          </div>
+
+          <div class="panel summary-panel">
+            <div class="panel-head">
+              <h3>Summary</h3>
+            </div>
+            <div id="summaryList" class="summary-list"></div>
+          </div>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="panel-head">
+            <h3>Recent transactions</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="transactionRows"></tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+
+    <div id="modal" class="modal hidden" aria-hidden="true">
+      <div class="modal-content">
+        <div class="modal-head">
+          <h3>Add transaction</h3>
+          <button id="closeModalBtn" class="close-btn">×</button>
+        </div>
+
+        <form id="transactionForm">
+          <label>
+            Title
+            <input id="titleInput" type="text" placeholder="e.g. Grocery shopping" required />
+          </label>
+
+          <div class="form-row">
+            <label>
+              Type
+              <select id="typeInput">
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </label>
+            <label>
+              Category
+              <select id="categoryInput">
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Housing">Housing</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Bills">Bills</option>
+                <option value="Salary">Salary</option>
+                <option value="Freelance">Freelance</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label>
+              Date
+              <input id="dateInput" type="date" required />
+            </label>
+            <label>
+              Amount
+              <input id="amountInput" type="number" min="0" step="0.01" placeholder="0.00" required />
+            </label>
+          </div>
+
+          <button type="submit" class="primary-btn full-width">Save transaction</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
