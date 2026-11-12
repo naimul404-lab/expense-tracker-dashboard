@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'expense-tracker-dashboard-v1';
+const STORAGE_KEY = 'cashflow-dashboard-v1';
 const budgetValue = document.getElementById('budgetValue');
 const incomeTotalEl = document.getElementById('incomeTotal');
 const expenseTotalEl = document.getElementById('expenseTotal');
@@ -7,23 +7,30 @@ const savingsTotalEl = document.getElementById('savingsTotal');
 const summaryList = document.getElementById('summaryList');
 const chart = document.getElementById('chart');
 const transactionRows = document.getElementById('transactionRows');
+const monthLabel = document.getElementById('monthLabel');
 const modal = document.getElementById('modal');
 const addTransactionBtn = document.getElementById('addTransactionBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const transactionForm = document.getElementById('transactionForm');
-const monthLabel = document.getElementById('monthLabel');
 
-const categories = [
-  'Food', 'Transport', 'Housing', 'Shopping', 'Bills', 'Salary', 'Freelance', 'Other'
-];
+const categoryPalette = {
+  Food: '#7dd3fc',
+  Transport: '#a78bfa',
+  Housing: '#4adea0',
+  Shopping: '#fbbf24',
+  Bills: '#f87171',
+  Salary: '#22c55e',
+  Freelance: '#22d3ee',
+  Other: '#c4b5fd'
+};
 
-let transactions = loadTransactions();
 let budget = 5000;
+let transactions = loadTransactions();
 
 function loadTransactions() {
   try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    return Array.isArray(stored) ? stored : [];
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    return Array.isArray(saved) ? saved : [];
   } catch {
     return [];
   }
@@ -36,13 +43,8 @@ function saveTransactions() {
 function formatCurrency(value) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2
+    currency: 'USD'
   }).format(value);
-}
-
-function monthName() {
-  return new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
 }
 
 function getTotals() {
@@ -50,8 +52,11 @@ function getTotals() {
   let expenses = 0;
 
   transactions.forEach((tx) => {
-    if (tx.type === 'income') income += Number(tx.amount);
-    else expenses += Number(tx.amount);
+    if (tx.type === 'income') {
+      income += Number(tx.amount);
+    } else {
+      expenses += Number(tx.amount);
+    }
   });
 
   return {
@@ -64,24 +69,26 @@ function getTotals() {
 
 function renderStats() {
   const totals = getTotals();
+  budgetValue.textContent = formatCurrency(budget);
   incomeTotalEl.textContent = formatCurrency(totals.income);
   expenseTotalEl.textContent = formatCurrency(totals.expenses);
   balanceTotalEl.textContent = formatCurrency(totals.balance);
   savingsTotalEl.textContent = formatCurrency(totals.savings);
-  budgetValue.textContent = formatCurrency(budget);
-  monthLabel.textContent = monthName();
+  monthLabel.textContent = new Date().toLocaleString('en-US', {
+    month: 'long',
+    year: 'numeric'
+  });
 }
 
-function buildSummary() {
-  const group = {};
-
+function renderSummary() {
+  const grouped = {};
   transactions
     .filter((tx) => tx.type === 'expense')
     .forEach((tx) => {
-      group[tx.category] = (group[tx.category] || 0) + Number(tx.amount);
+      grouped[tx.category] = (grouped[tx.category] || 0) + Number(tx.amount);
     });
 
-  const entries = Object.entries(group).sort((a, b) => b[1] - a[1]);
+  const entries = Object.entries(grouped).sort((a, b) => b[1] - a[1]);
   const total = entries.reduce((sum, [, value]) => sum + value, 0) || 1;
 
   summaryList.innerHTML = '';
@@ -89,10 +96,9 @@ function buildSummary() {
   entries.forEach(([category, value]) => {
     const item = document.createElement('div');
     item.className = 'summary-item';
-    const palette = getCategoryColor(category);
     item.innerHTML = `
       <div class="summary-left">
-        <span class="dot" style="background:${palette}"></span>
+        <span class="dot" style="background:${categoryPalette[category] || '#9bb1c9'}"></span>
         <div>
           <strong>${category}</strong>
           <span>${((value / total) * 100).toFixed(0)}% of spend</span>
@@ -104,21 +110,6 @@ function buildSummary() {
   });
 }
 
-function getCategoryColor(category) {
-  const palette = {
-    Food: '#7dd3fc',
-    Transport: '#a78bfa',
-    Housing: '#4adea0',
-    Shopping: '#fbbf24',
-    Bills: '#f87171',
-    Salary: '#34d399',
-    Freelance: '#22d3ee',
-    Other: '#c4b5fd'
-  };
-
-  return palette[category] || '#9cb0c6';
-}
-
 function renderChart() {
   const grouped = {};
   transactions
@@ -128,10 +119,10 @@ function renderChart() {
     });
 
   chart.innerHTML = '';
-
   const values = Object.values(grouped);
   const max = Math.max(...values, 1);
 
+  const categories = ['Food', 'Transport', 'Housing', 'Shopping', 'Bills', 'Other'];
   categories.forEach((category) => {
     const value = grouped[category] || 0;
     const wrap = document.createElement('div');
@@ -140,7 +131,7 @@ function renderChart() {
     bar.className = 'chart-bar';
     bar.title = `${category}: ${formatCurrency(value)}`;
     bar.style.height = `${(value / max) * 100}%`;
-    bar.style.background = `linear-gradient(180deg, ${getCategoryColor(category)} 0%, rgba(255,255,255,0.15) 100%)`;
+    bar.style.background = `linear-gradient(180deg, ${categoryPalette[category] || '#9bb1c9'} 0%, rgba(255,255,255,0.12) 100%)`;
     wrap.appendChild(bar);
     chart.appendChild(wrap);
   });
@@ -160,7 +151,7 @@ function renderTransactions() {
         <td>${tx.type === 'income' ? 'Income' : 'Expense'}</td>
         <td>${new Date(tx.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
         <td class="${tx.type === 'income' ? 'amount-income' : 'amount-expense'}">${tx.type === 'income' ? '+' : '-'}${formatCurrency(Number(tx.amount))}</td>
-        <td><button class="delete-btn" data-id="${tx.id}" aria-label="Delete ${tx.title}">×</button></td>
+        <td><button type="button" class="delete-btn" data-id="${tx.id}" aria-label="Delete ${tx.title}">×</button></td>
       `;
       transactionRows.appendChild(row);
     });
@@ -176,7 +167,7 @@ function renderTransactions() {
 
 function renderDashboard() {
   renderStats();
-  buildSummary();
+  renderSummary();
   renderChart();
   renderTransactions();
 }
@@ -210,7 +201,9 @@ transactionForm.addEventListener('submit', (event) => {
     amount: Number(document.getElementById('amountInput').value)
   };
 
-  if (!tx.title || !tx.date || Number.isNaN(tx.amount) || tx.amount <= 0) return;
+  if (!tx.title || !tx.date || Number.isNaN(tx.amount) || tx.amount <= 0) {
+    return;
+  }
 
   transactions.push(tx);
   saveTransactions();

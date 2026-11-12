@@ -1,15 +1,14 @@
-# Expense Tracker Dashboard
+# CashFlow Tracker
 
-A modern dashboard for tracking income, expenses, categories, monthly balance, and spending trends.
+A modern dashboard for monitoring income, expenses, monthly budgets, and category-based spending.
 
 ## Features
-
-- Add income and expense entries
-- Track expenses by category
-- View total income, total expenses, balance, and savings
-- Monthly visual summary and spending chart
-- Recent transactions table
-- Local storage persistence using browser `localStorage`
+- Add income and expense transactions
+- Track spending by category
+- View income, expenses, balance, and savings totals
+- See a visual spending chart
+- Browse recent transactions
+- Save data in the browser with localStorage
 
 ## Run locally
 
@@ -23,15 +22,14 @@ Then open:
 http://localhost:8000
 ```
 
-## Project structure
+## Files
 
 ```text
-expense-tracker-dashboard/
+cashflow-tracker/
 ├── index.html
 ├── styles.css
 ├── script.js
 ├── README.md
-├── LICENSE
 └── .gitignore
 ```
 
